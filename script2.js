@@ -14,8 +14,51 @@ function populateInfo() {
     }
 }
 
+function createCookies() {
+    var formFields = 
+        document.querySelectorAll("input[type=hidden], input[type=radio], textarea");
+    var expiresDate = new Date();
+    console.log(expiresDate)
+    expiresDate.setDate(expiresDate.getDate() + 7)
+
+    for (var i = 0; i < formFields.length; i++) {
+        var currentValue = 
+            decodeURIComponent(formFields[i].value);
+        currentValue = currentValue.replace(/\+/g, " ");
+        document.cookie = formFields[i].name + "=" + currentValue + "; expires=" + expiresDate.toUTCString();
+    }
+}
+
+function handleSubmit(evt) {
+    console.log("submitted")
+    if (evt.preventDefault) {
+        evt.preventDefault(); // prevent form from submitting
+    }  else {
+        evt.returnValue = false; // prevent form from submitting in IE8
+    }
+    
+    createCookies();
+    
+    document.getElementsByTagName("form")[0].submit();
+}
+
+function createEventListeners() {
+    var form = document.getElementsByTagName("form")[0];
+    if (form.addEventListener) {
+        form.addEventListener("submit", handleSubmit, false);
+    } else if (form.attachEvent) {
+        form.attachEvent("onsubmit", handleSubmit)
+    }
+}
+
+function setUpPage() {
+    createEventListeners();
+    populateInfo();
+}
+                            
+
 if (window.addEventListener) {
-    window.addEventListener("load", populateInfo(), false)
+    window.addEventListener("load", setUpPage, false)
 } else if (window.attachEvent) {
-    window.attachEvent("onload", populateInfo);
+    window.attachEvent("onload", setUpPage);
 }
